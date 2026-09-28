@@ -1,318 +1,583 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Login - Nova Rise Academy</title>
+<title>Nova Rise Academy - Login</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #f3f7ff;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+body{
+  font-family:Arial,sans-serif;
+  background:#f3f7ff;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
 
-    .container {
-      width: 100%;
-      max-width: 430px;
-      background: white;
-      padding: 30px 25px;
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.10);
-    }
+.box{
+  width:100%;
+  max-width:450px;
+  background:white;
+  padding:28px;
+  border-radius:18px;
+  box-shadow:0 8px 30px rgba(0,0,0,.10);
+}
 
-    .logo {
-      text-align: center;
-      margin-bottom: 25px;
-    }
+.logo{
+  text-align:center;
+  margin-bottom:25px;
+}
 
-    .logo h1 {
-      color: #0d6efd;
-      font-size: 28px;
-    }
+.logo h1{
+  color:#0d6efd;
+  font-size:28px;
+}
 
-    .logo p {
-      color: #666;
-      margin-top: 5px;
-      font-size: 14px;
-    }
+.logo p{
+  color:#666;
+  margin-top:6px;
+  font-size:14px;
+}
 
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #172033;
-    }
+h2{
+  text-align:center;
+  color:#172033;
+  margin-bottom:20px;
+}
 
-    input {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 14px;
-      border: 1px solid #d6dce5;
-      border-radius: 8px;
-      font-size: 15px;
-      outline: none;
-    }
+input,select{
+  width:100%;
+  padding:13px;
+  margin-bottom:13px;
+  border:1px solid #d5dce8;
+  border-radius:8px;
+  font-size:15px;
+}
 
-    input:focus {
-      border-color: #0d6efd;
-    }
+input:focus,select:focus{
+  outline:none;
+  border-color:#0d6efd;
+}
 
-    button {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      background: #0d6efd;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+button{
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:8px;
+  background:#0d6efd;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    button:hover {
-      background: #084298;
-    }
+button:hover{
+  background:#084298;
+}
 
-    .switch {
-      text-align: center;
-      margin-top: 18px;
-      color: #666;
-      font-size: 14px;
-    }
+.switch{
+  text-align:center;
+  margin-top:18px;
+  color:#666;
+  font-size:14px;
+}
 
-    .switch a {
-      color: #0d6efd;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.switch a{
+  color:#0d6efd;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    #message {
-      text-align: center;
-      margin-top: 15px;
-      font-size: 14px;
-    }
+.hidden{
+  display:none;
+}
 
-    .back {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      color: #0d6efd;
-      text-decoration: none;
-      font-size: 14px;
-    }
+#message{
+  text-align:center;
+  margin-top:15px;
+  font-size:14px;
+  color:#333;
+}
 
-    .hidden {
-      display: none;
-    }
-  </style>
+.back{
+  display:block;
+  text-align:center;
+  margin-top:20px;
+  color:#0d6efd;
+  text-decoration:none;
+  font-size:14px;
+}
+
+.plan-title{
+  font-size:14px;
+  font-weight:bold;
+  margin-bottom:8px;
+  color:#172033;
+}
+
+.plan-info{
+  background:#f1f6ff;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:13px;
+  font-size:13px;
+  color:#555;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="box">
 
-    <div class="logo">
-      <h1>Nova Rise Academy</h1>
-      <p>Skills • Freelancing • Company Work</p>
+  <div class="logo">
+    <h1>Nova Rise Academy</h1>
+    <p>Skills • Freelancing • Company Work</p>
+  </div>
+
+
+  <!-- LOGIN -->
+
+  <div id="loginBox">
+
+    <h2>Member Login</h2>
+
+    <input
+      type="email"
+      id="loginEmail"
+      placeholder="Enter your email"
+    >
+
+    <input
+      type="password"
+      id="loginPassword"
+      placeholder="Enter your password"
+    >
+
+    <button onclick="loginUser()">
+      Login
+    </button>
+
+    <div class="switch">
+      Don't have an account?
+      <a onclick="showRegister()">Register</a>
     </div>
-
-    <!-- LOGIN -->
-    <div id="loginBox">
-      <h2>Member Login</h2>
-
-      <input
-        type="email"
-        id="loginEmail"
-        placeholder="Enter your email"
-      >
-
-      <input
-        type="password"
-        id="loginPassword"
-        placeholder="Enter your password"
-      >
-
-      <button onclick="loginUser()">Login</button>
-
-      <div class="switch">
-        Don't have an account?
-        <a onclick="showRegister()">Register</a>
-      </div>
-    </div>
-
-    <!-- REGISTER -->
-    <div id="registerBox" class="hidden">
-      <h2>Create Account</h2>
-
-      <input
-        type="text"
-        id="registerName"
-        placeholder="Full name"
-      >
-
-      <input
-        type="email"
-        id="registerEmail"
-        placeholder="Email address"
-      >
-
-      <input
-        type="password"
-        id="registerPassword"
-        placeholder="Create password"
-      >
-
-      <button onclick="registerUser()">Register</button>
-
-      <div class="switch">
-        Already have an account?
-        <a onclick="showLogin()">Login</a>
-      </div>
-    </div>
-
-    <div id="message"></div>
-
-    <a href="index.html" class="back">← Back to Website</a>
 
   </div>
 
+
+  <!-- REGISTER -->
+
+  <div id="registerBox" class="hidden">
+
+    <h2>Create Account</h2>
+
+    <input
+      type="text"
+      id="registerName"
+      placeholder="Full Name"
+    >
+
+    <input
+      type="email"
+      id="registerEmail"
+      placeholder="Gmail / Email"
+    >
+
+    <input
+      type="password"
+      id="registerPassword"
+      placeholder="Create Password"
+    >
+
+    <div class="plan-title">
+      Select Membership
+    </div>
+
+    <select id="membershipPlan">
+
+      <option value="">
+        Select Membership Plan
+      </option>
+
+      <option value="Basic">
+        Basic Membership - ₹349
+      </option>
+
+      <option value="Special">
+        Special Membership - ₹849
+      </option>
+
+      <option value="Premium">
+        Premium Membership - ₹1,279
+      </option>
+
+    </select>
+
+    <div class="plan-info">
+      Select your membership plan before creating your account.
+    </div>
+
+    <input
+      type="text"
+      id="referralCode"
+      placeholder="Referral Code (Optional)"
+    >
+
+    <button onclick="registerUser()">
+      Create Account
+    </button>
+
+    <div class="switch">
+      Already have an account?
+      <a onclick="showLogin()">Login</a>
+    </div>
+
+  </div>
+
+
+  <div id="message"></div>
+
+  <a href="index.html" class="back">
+    ← Back to Website
+  </a>
+
+</div>
+
+
 <script>
 
-  /*
-    IMPORTANT:
-    Replace these two values with your Supabase
-    Project URL and ANON/PUBLIC key.
+/* =========================================
+   SUPABASE SETTINGS
+   =========================================
 
-    NEVER put the Service Role key here.
+   IMPORTANT:
+
+   Line 1 = your existing Supabase URL
+   Line 2 = your existing Publishable API key
+
+   Do NOT use Secret/service_role key.
+*/
+
+
+const SUPABASE_URL =
+"https://cbmpqytinlrvvbjzirkx.supabase.co";
+
+
+const SUPABASE_ANON_KEY =
+"PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+
+
+const supabaseClient =
+supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+
+/* =========================================
+   SHOW REGISTER
+   ========================================= */
+
+function showRegister(){
+
+  document
+    .getElementById("loginBox")
+    .classList.add("hidden");
+
+  document
+    .getElementById("registerBox")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("message")
+    .innerText = "";
+
+}
+
+
+/* =========================================
+   SHOW LOGIN
+   ========================================= */
+
+function showLogin(){
+
+  document
+    .getElementById("registerBox")
+    .classList.add("hidden");
+
+  document
+    .getElementById("loginBox")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("message")
+    .innerText = "";
+
+}
+
+
+/* =========================================
+   REGISTER
+   ========================================= */
+
+async function registerUser(){
+
+  const name =
+    document
+      .getElementById("registerName")
+      .value
+      .trim();
+
+  const email =
+    document
+      .getElementById("registerEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("registerPassword")
+      .value;
+
+  const plan =
+    document
+      .getElementById("membershipPlan")
+      .value;
+
+  const referral =
+    document
+      .getElementById("referralCode")
+      .value
+      .trim();
+
+  const message =
+    document.getElementById("message");
+
+
+  if(!name){
+
+    message.innerText =
+      "Please enter your full name.";
+
+    return;
+  }
+
+
+  if(!email){
+
+    message.innerText =
+      "Please enter your email.";
+
+    return;
+  }
+
+
+  if(!password){
+
+    message.innerText =
+      "Please create a password.";
+
+    return;
+  }
+
+
+  if(password.length < 6){
+
+    message.innerText =
+      "Password must be at least 6 characters.";
+
+    return;
+  }
+
+
+  if(!plan){
+
+    message.innerText =
+      "Please select a membership plan.";
+
+    return;
+  }
+
+
+  message.innerText =
+    "Creating your account...";
+
+
+  const { data, error } =
+    await supabaseClient.auth.signUp({
+
+      email: email,
+
+      password: password,
+
+      options: {
+
+        data: {
+
+          full_name: name,
+
+          membership_plan: plan,
+
+          referral_code: referral
+
+        }
+
+      }
+
+    });
+
+
+  if(error){
+
+    message.innerText =
+      error.message;
+
+    return;
+  }
+
+
+  /*
+    If email confirmation is disabled,
+    user can continue directly.
+
+    If email confirmation is enabled,
+    Supabase will ask the user to
+    verify their email.
   */
 
-  const SUPABASE_URL = https://cbmpqytinlrvvbjzirkx.supabase.co
-  const SUPABASE_ANON_KEY = "sb_publishable_wI01RZkPQ1MsfAQBVVUHyg_ETCmkjvw"
 
-  const supabaseClient =
-    supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
-
-
-  function showRegister() {
-    document.getElementById("loginBox").classList.add("hidden");
-    document.getElementById("registerBox").classList.remove("hidden");
-    document.getElementById("message").innerText = "";
-  }
-
-
-  function showLogin() {
-    document.getElementById("registerBox").classList.add("hidden");
-    document.getElementById("loginBox").classList.remove("hidden");
-    document.getElementById("message").innerText = "";
-  }
-
-
-  async function registerUser() {
-
-    const name =
-      document.getElementById("registerName").value.trim();
-
-    const email =
-      document.getElementById("registerEmail").value.trim();
-
-    const password =
-      document.getElementById("registerPassword").value;
-
-    const message =
-      document.getElementById("message");
-
-    if (!name || !email || !password) {
-      message.innerText =
-        "Please fill all fields.";
-      return;
-    }
-
-    if (password.length < 6) {
-      message.innerText =
-        "Password must be at least 6 characters.";
-      return;
-    }
-
-    message.innerText = "Creating account...";
-
-    const { data, error } =
-      await supabaseClient.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            full_name: name
-          }
-        }
-      });
-
-    if (error) {
-      message.innerText = error.message;
-      return;
-    }
+  if(data.session){
 
     message.innerText =
-      "Registration successful. Check your email if verification is required.";
+      "Account created successfully! Opening dashboard...";
 
-  }
+    setTimeout(function(){
 
+      window.location.href =
+        "member.html";
 
-  async function loginUser() {
+    },1000);
 
-    const email =
-      document.getElementById("loginEmail").value.trim();
-
-    const password =
-      document.getElementById("loginPassword").value;
-
-    const message =
-      document.getElementById("message");
-
-    if (!email || !password) {
-      message.innerText =
-        "Please enter email and password.";
-      return;
-    }
-
-    message.innerText = "Logging in...";
-
-    const { data, error } =
-      await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-
-    if (error) {
-      message.innerText = error.message;
-      return;
-    }
+  }else{
 
     message.innerText =
-      "Login successful. Opening dashboard...";
-
-    setTimeout(() => {
-      window.location.href = "member.html";
-    }, 800);
+      "Account created! Please check your email for verification, then login.";
 
   }
+
+}
+
+
+/* =========================================
+   LOGIN
+   ========================================= */
+
+async function loginUser(){
+
+  const email =
+    document
+      .getElementById("loginEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("loginPassword")
+      .value;
+
+  const message =
+    document.getElementById("message");
+
+
+  if(!email){
+
+    message.innerText =
+      "Please enter your email.";
+
+    return;
+  }
+
+
+  if(!password){
+
+    message.innerText =
+      "Please enter your password.";
+
+    return;
+  }
+
+
+  message.innerText =
+    "Logging in...";
+
+
+  const { data, error } =
+    await supabaseClient.auth.signInWithPassword({
+
+      email: email,
+
+      password: password
+
+    });
+
+
+  if(error){
+
+    message.innerText =
+      error.message;
+
+    return;
+  }
+
+
+  message.innerText =
+    "Login successful! Opening dashboard...";
+
+
+  setTimeout(function(){
+
+    window.location.href =
+      "member.html";
+
+  },800);
+
+}
+
+
+/* =========================================
+   REFERRAL LINK SUPPORT
+   ========================================= */
+
+const urlParams =
+  new URLSearchParams(
+    window.location.search
+  );
+
+const ref =
+  urlParams.get("ref");
+
+
+if(ref){
+
+  document
+    .getElementById("referralCode")
+    .value = ref;
+
+}
 
 </script>
 
 </body>
-</htm
+</html>
