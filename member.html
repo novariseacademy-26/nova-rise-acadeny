@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Member Dashboard - Nova Rise Academy</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+font-family:Arial,sans-serif;
+background:#f3f7ff;
+color:#172033;
+}
+
+header{
+background:#0d6efd;
+color:white;
+padding:18px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+header h2{font-size:20px}
+
+.logout{
+background:white;
+color:#0d6efd;
+border:0;
+padding:9px 15px;
+border-radius:7px;
+font-weight:bold;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+padding:20px;
+}
+
+.welcome{
+background:white;
+padding:20px;
+border-radius:14px;
+margin-bottom:20px;
+box-shadow:0 5px 20px rgba(0,0,0,.07);
+}
+
+.welcome h1{
+font-size:25px;
+margin-bottom:7px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:14px;
+box-shadow:0 5px 20px rgba(0,0,0,.07);
+}
+
+.card h3{
+margin-bottom:10px;
+color:#0d6efd;
+}
+
+.plan{
+border:2px solid #e4e9f2;
+padding:15px;
+border-radius:10px;
+margin-top:10px;
+cursor:pointer;
+}
+
+.plan:hover{
+border-color:#0d6efd;
+}
+
+.price{
+font-size:22px;
+font-weight:bold;
+margin:5px 0;
+}
+
+input,select{
+width:100%;
+padding:12px;
+margin-top:8px;
+border:1px solid #d5dce8;
+border-radius:8px;
+}
+
+button{
+background:#0d6efd;
+color:white;
+border:0;
+padding:12px 18px;
+border-radius:8px;
+font-weight:bold;
+margin-top:12px;
+cursor:pointer;
+}
+
+.referral{
+background:#eef5ff;
+padding:12px;
+border-radius:8px;
+margin-top:10px;
+word-break:break-all;
+}
+
+.notice{
+margin-top:12px;
+font-size:14px;
+color:#666;
+}
+
+.full{
+grid-column:1/-1;
+}
+
+@media(max-width:650px){
+.grid{
+grid-template-columns:1fr;
+}
+.full{
+grid-column:auto;
+}
+header h2{
+font-size:16px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>Nova Rise Academy</h2>
+<button class="logout" onclick="logoutUser()">Logout</button>
+</header>
+
+<div class="container">
+
+<div class="welcome">
+<h1>Member Dashboard</h1>
+<p id="userEmail">Loading account...</p>
+</div>
+
+<div class="grid">
+
+<div class="card">
+<h3>💰 Today's Income</h3>
+<h2>₹0</h2>
+<p class="notice">Income will appear here.</p>
+</div>
+
+<div class="card">
+<h3>📊 Total Income</h3>
+<h2>₹0</h2>
+<p class="notice">Your total income.</p>
+</div>
+
+<div class="card">
+<h3>👥 My Referral</h3>
+<p>Your referral code:</p>
+
+<div class="referral" id="referralCode">
+Loading...
+</div>
+
+<button onclick="copyReferral()">Copy Referral</button>
+</div>
+
+<div class="card">
+<h3>⭐ Membership</h3>
+
+<select id="membership">
+<option value="">Select Membership</option>
+<option value="Basic">Basic - ₹349</option>
+<option value="Special">Special - ₹849</option>
+<option value="Premium">Premium - ₹1,279</option>
+</select>
+
+<button onclick="saveMembership()">Select Membership</button>
+
+<p id="membershipMessage" class="notice"></p>
+</div>
+
+<div class="card full">
+<h3>💳 Payment Verification</h3>
+
+<p>Select your membership and submit payment information.</p>
+
+<label>Payment UTR / Transaction ID</label>
+<input
+type="text"
+id="utr"
+placeholder="Enter UTR / Transaction ID">
+
+<label>Payment Screenshot</label>
+<input
+type="file"
+id="paymentFile"
+accept="image/*">
+
+<button onclick="submitPayment()">Submit Payment</button>
+
+<p id="paymentMessage" class="notice"></p>
+</div>
+
+<div class="card full">
+<h3>📈 Commission</h3>
+
+<p><strong>Commission:</strong> 70%</p>
+<p class="notice">
+Commission details will be connected with your membership and work records.
+</p>
+</div>
+
+</div>
+</div>
+
+<script>
+
+const SUPABASE_URL =
+"https://cbmpqytinlrvvbjzirkx.supabase.co";
+
+const SUPABASE_ANON_KEY =
+"sb_publishable_wI01RZkPQ1MsfAQBVVUHyg_ETCmkjvw"
+
+const supabaseClient =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_ANON_KEY
+);
+
+
+async function checkUser(){
+
+const {data,error} =
+await supabaseClient.auth.getUser();
+
+if(error || !data.user){
+
+window.location.href="login.html";
+return;
+}
+
+document.getElementById("userEmail").innerText =
+data.user.email;
+
+const shortId =
+data.user.id.substring(0,8).toUpperCase();
+
+document.getElementById("referralCode").innerText =
+"NRA-" + shortId;
+
+}
+
+
+async function logoutUser(){
+
+await supabaseClient.auth.signOut();
+
+window.location.href="login.html";
+
+}
+
+
+function copyReferral(){
+
+const code =
+document.getElementById("referralCode").innerText;
+
+navigator.clipboard.writeText(code);
+
+alert("Referral code copied!");
+
+}
+
+
+function saveMembership(){
+
+const plan =
+document.getElementById("membership").value;
+
+if(!plan){
+
+document.getElementById("membershipMessage").innerText =
+"Please select a membership.";
+
+return;
+}
+
+localStorage.setItem("selectedMembership",plan);
+
+document.getElementById("membershipMessage").innerText =
+plan + " membership selected.";
+
+}
+
+
+function submitPayment(){
+
+const utr =
+document.getElementById("utr").value.trim();
+
+const file =
+document.getElementById("paymentFile").files[0];
+
+if(!utr){
+
+document.getElementById("paymentMessage").innerText =
+"Please enter UTR / Transaction ID.";
+
+return;
+}
+
+if(!file){
+
+document.getElementById("paymentMessage").innerText =
+"Please select payment screenshot.";
+
+return;
+}
+
+document.getElementById("paymentMessage").innerText =
+"Payment details received. Payment upload will be connected to Supabase storage in the next step.";
+
+}
+
+
+checkUser();
+
+</script>
+
+</body>
+</html>
