@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Dashboard - Nova Rise Academy</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,sans-serif;
+  background:#f3f7ff;
+  color:#172033;
+}
+
+header{
+  background:#0d6efd;
+  color:white;
+  padding:18px 25px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+header h1{
+  font-size:22px;
+}
+
+.logout{
+  background:white;
+  color:#0d6efd;
+  border:0;
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.container{
+  max-width:1100px;
+  margin:25px auto;
+  padding:0 15px;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  margin-bottom:20px;
+  border-radius:14px;
+  box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+.card h2{
+  margin-bottom:15px;
+  color:#0d6efd;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:15px;
+}
+
+.stat{
+  background:#f7f9fc;
+  padding:20px;
+  border-radius:12px;
+}
+
+.stat h3{
+  color:#555;
+  font-size:15px;
+  margin-bottom:10px;
+}
+
+.stat p{
+  font-size:25px;
+  font-weight:bold;
+}
+
+button.action{
+  background:#0d6efd;
+  color:white;
+  border:0;
+  padding:11px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  margin:5px;
+}
+
+button.action:hover{
+  background:#084298;
+}
+
+#message{
+  margin-top:15px;
+  padding:12px;
+  border-radius:8px;
+  background:#eef4ff;
+}
+
+pre{
+  white-space:pre-wrap;
+  word-break:break-word;
+  background:#111827;
+  color:#fff;
+  padding:15px;
+  border-radius:10px;
+  overflow:auto;
+  font-size:13px;
+}
+
+.hidden{
+  display:none;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+
+th,td{
+  border:1px solid #ddd;
+  padding:10px;
+  text-align:left;
+  font-size:13px;
+}
+
+th{
+  background:#eef4ff;
+}
+
+@media(max-width:600px){
+  header{
+    padding:15px;
+  }
+
+  header h1{
+    font-size:18px;
+  }
+
+  .container{
+    margin-top:15px;
+  }
+
+  table{
+    display:block;
+    overflow-x:auto;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Nova Rise Academy — Admin</h1>
+  <button class="logout" onclick="logoutAdmin()">Logout</button>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Admin Dashboard</h2>
+    <p id="adminInfo">Checking admin login...</p>
+    <div id="message"></div>
+  </div>
+
+  <div class="grid">
+
+    <div class="stat">
+      <h3>Members</h3>
+      <p id="memberCount">—</p>
+    </div>
+
+    <div class="stat">
+      <h3>Membership Plans</h3>
+      <p id="planCount">—</p>
+    </div>
+
+    <div class="stat">
+      <h3>Payments</h3>
+      <p id="paymentCount">—</p>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <h2>Admin Controls</h2>
+
+    <button class="action" onclick="loadMembers()">
+      View Members
+    </button>
+
+    <button class="action" onclick="loadPlans()">
+      View Membership Plans
+    </button>
+
+    <button class="action" onclick="loadPayments()">
+      View Payments
+    </button>
+
+    <div id="dataArea"></div>
+  </div>
+
+</div>
+
+<script>
+
+/* ================================
+   SUPABASE CONNECTION
+================================ */
+
+const SUPABASE_URL =
+"https://cbmpqytinlrvvbjzirkx.supabase.co";
+
+const SUPABASE_ANON_KEY =
+"sb_publishable_wI01RZkPQ1MsfAQBVVUHyg_ETCmkjvw"
+
+const supabaseClient =
+supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+
+/* ================================
+   ADMIN EMAIL
+   CHANGE THIS TO YOUR ADMIN GMAIL
+================================ */
+
+const ADMIN_EMAIL =
+"sidhujashandeep36@gmail.com";
+
+
+/* ================================
+   CHECK ADMIN
+================================ */
+
+async function checkAdmin(){
+
+  const {
+    data: { user },
+    error
+  } = await supabaseClient.auth.getUser();
+
+  if(error || !user){
+
+    document.getElementById("adminInfo").innerText =
+      "Please login first.";
+
+    return;
+  }
+
+  document.getElementById("adminInfo").innerText =
+    "Logged in as: " + user.email;
+
+  /*
+    IMPORTANT:
+    This is only a basic front-end check.
+    Real security must also be enforced
+    with Supabase RLS policies.
+  */
+
+  if(user.email !== ADMIN_EMAIL){
+
+    document.getElementById("message").innerText =
+      "This account is not authorized as admin.";
+
+    return;
+  }
+
+  document.getElementById("message").innerText =
+    "Admin access active.";
+
+  loadCounts();
+}
+
+
+/* ================================
+   COUNTS
+================================ */
+
+async function loadCounts(){
+
+  const members =
+    await supabaseClient
+    .from("profiles")
+    .select("*",{count:"exact",head:true});
+
+  const plans =
+    await supabaseClient
+    .from("membership_plans")
+    .select("*",{count:"exact",head:true});
+
+  const payments =
+    await supabaseClient
+    .from("payments")
+    .select("*",{count:"exact",head:true});
+
+  document.getElementById("memberCount").innerText =
+    members.count ?? 0;
+
+  document.getElementById("planCount").innerText =
+    plans.count ?? 0;
+
+  document.getElementById("paymentCount").innerText =
+    payments.count ?? 0;
+}
+
+
+/* ================================
+   VIEW MEMBERS
+================================ */
+
+async function loadMembers(){
+
+  const {data,error} =
+    await supabaseClient
+    .from("profiles")
+    .select("*")
+    .limit(100);
+
+  if(error){
+
+    showError(error.message);
+    return;
+  }
+
+  showData("Members",data);
+}
+
+
+/* ================================
+   VIEW PLANS
+================================ */
+
+async function loadPlans(){
+
+  const {data,error} =
+    await supabaseClient
+    .from("membership_plans")
+    .select("*")
+    .order("id");
+
+  if(error){
+
+    showError(error.message);
+    return;
+  }
+
+  showData("Membership Plans",data);
+}
+
+
+/* ================================
+   VIEW PAYMENTS
+================================ */
+
+async function loadPayments(){
+
+  const {data,error} =
+    await supabaseClient
+    .from("payments")
+    .select("*")
+    .limit(100);
+
+  if(error){
+
+    showError(error.message);
+    return;
+  }
+
+  showData("Payments",data);
+}
+
+
+/* ================================
+   DISPLAY DATA
+================================ */
+
+function showData(title,data){
+
+  const area =
+    document.getElementById("dataArea");
+
+  if(!data || data.length === 0){
+
+    area.innerHTML =
+      "<div id='message'>No records found.</div>";
+
+    return;
+  }
+
+  const columns =
+    Object.keys(data[0]);
+
+  let html =
+    "<h3 style='margin-top:20px'>" +
+    title +
+    "</h3>";
+
+  html += "<table><thead><tr>";
+
+  columns.forEach(col=>{
+    html += "<th>" + col + "</th>";
+  });
+
+  html += "</tr></thead><tbody>";
+
+  data.forEach(row=>{
+
+    html += "<tr>";
+
+    columns.forEach(col=>{
+
+      let value = row[col];
+
+      if(value === null || value === undefined){
+        value = "";
+      }
+
+      if(typeof value === "object"){
+        value = JSON.stringify(value);
+      }
+
+      html +=
+        "<td>" +
+        String(value) +
+        "</td>";
+    });
+
+    html += "</tr>";
+
+  });
+
+  html += "</tbody></table>";
+
+  area.innerHTML = html;
+}
+
+
+/* ================================
+   ERROR
+================================ */
+
+function showError(error){
+
+  document.getElementById("dataArea").innerHTML =
+    "<div id='message'>Error: " +
+    error +
+    "</div>";
+}
+
+
+/* ================================
+   LOGOUT
+================================ */
+
+async function logoutAdmin(){
+
+  await supabaseClient.auth.signOut();
+
+  window.location.href =
+    "login.html";
+}
+
+
+/* ================================
+   START
+================================ */
+
+checkAdmin();
+
+</script>
+
+</body>
+</html>
