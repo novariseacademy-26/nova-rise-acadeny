@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Nova Rise Academy - Registration</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#eef5ff,#ffffff);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    color:#172033;
+}
+
+.container{
+    width:100%;
+    max-width:520px;
+}
+
+.card{
+    background:#fff;
+    border-radius:22px;
+    padding:28px;
+    box-shadow:0 12px 40px rgba(0,0,0,0.12);
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:8px;
+    font-size:28px;
+    font-weight:800;
+    color:#1464f4;
+}
+
+.subtitle{
+    text-align:center;
+    color:#6b7280;
+    margin-bottom:25px;
+    font-size:14px;
+}
+
+.step{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:22px;
+}
+
+.step span{
+    flex:1;
+    height:5px;
+    background:#dbe5f5;
+    border-radius:10px;
+}
+
+.step span.active{
+    background:#1464f4;
+}
+
+label{
+    display:block;
+    font-size:14px;
+    font-weight:700;
+    margin-bottom:7px;
+    color:#263246;
+}
+
+.input-group{
+    margin-bottom:17px;
+}
+
+input,select{
+    width:100%;
+    padding:13px 14px;
+    border:1px solid #d7deea;
+    border-radius:11px;
+    outline:none;
+    font-size:15px;
+    background:#fff;
+}
+
+input:focus,select:focus{
+    border-color:#1464f4;
+    box-shadow:0 0 0 3px rgba(20,100,244,0.10);
+}
+
+.plans{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-bottom:18px;
+}
+
+.plan{
+    border:2px solid #dce3ee;
+    border-radius:12px;
+    padding:13px 5px;
+    text-align:center;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.plan:hover{
+    border-color:#1464f4;
+}
+
+.plan.selected{
+    border-color:#1464f4;
+    background:#eef5ff;
+}
+
+.plan strong{
+    display:block;
+    color:#1464f4;
+    margin-bottom:5px;
+}
+
+.plan small{
+    color:#555;
+}
+
+.qr-box{
+    background:#f7f9fc;
+    border:1px dashed #b9c5d8;
+    border-radius:15px;
+    padding:18px;
+    text-align:center;
+    margin-bottom:18px;
+}
+
+.qr-box img{
+    width:190px;
+    max-width:100%;
+    border-radius:10px;
+    margin:10px auto;
+    display:block;
+}
+
+.qr-box p{
+    font-size:13px;
+    color:#667085;
+}
+
+.file-box{
+    border:1px dashed #b9c5d8;
+    background:#fafcff;
+    border-radius:12px;
+    padding:14px;
+}
+
+input[type="file"]{
+    border:0;
+    padding:5px 0;
+}
+
+.notice{
+    background:#fff8e6;
+    border:1px solid #f4d78a;
+    color:#765900;
+    padding:12px;
+    border-radius:10px;
+    font-size:13px;
+    line-height:1.5;
+    margin-bottom:18px;
+}
+
+button{
+    width:100%;
+    border:0;
+    padding:15px;
+    border-radius:12px;
+    background:#1464f4;
+    color:white;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0d55d6;
+}
+
+.login-link{
+    text-align:center;
+    margin-top:18px;
+    font-size:14px;
+    color:#667085;
+}
+
+.login-link a{
+    color:#1464f4;
+    font-weight:700;
+    text-decoration:none;
+}
+
+.error{
+    display:none;
+    background:#ffecec;
+    color:#b42318;
+    border:1px solid #f5b5b0;
+    padding:10px;
+    border-radius:9px;
+    font-size:13px;
+    margin-bottom:15px;
+}
+
+.success{
+    display:none;
+    text-align:center;
+}
+
+.success-icon{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    background:#e8fff1;
+    color:#159447;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:35px;
+    margin:0 auto 18px;
+}
+
+.success h2{
+    margin-bottom:10px;
+}
+
+.success p{
+    color:#667085;
+    line-height:1.6;
+    font-size:14px;
+    margin-bottom:20px;
+}
+
+@media(max-width:430px){
+    .card{
+        padding:21px;
+    }
+
+    .plans{
+        grid-template-columns:1fr;
+    }
+
+    .logo{
+        font-size:24px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div id="registrationSection">
+
+<div class="logo">NOVA RISE ACADEMY</div>
+
+<div class="subtitle">
+Membership Registration
+</div>
+
+<div class="step">
+    <span class="active"></span>
+    <span></span>
+    <span></span>
+</div>
+
+<div id="errorBox" class="error"></div>
+
+<form id="registerForm">
+
+<div class="input-group">
+<label>Full Name</label>
+<input type="text" id="name" placeholder="Enter your full name" required>
+</div>
+
+<div class="input-group">
+<label>Gmail Address</label>
+<input type="email" id="email" placeholder="example@gmail.com" required>
+</div>
+
+<div class="input-group">
+<label>Mobile Number</label>
+<input type="tel" id="mobile" placeholder="Enter 10 digit mobile number"
+maxlength="10" required>
+</div>
+
+<div class="input-group">
+<label>Password</label>
+<input type="password" id="password"
+placeholder="Create password" minlength="6" required>
+</div>
+
+<div class="input-group">
+<label>Confirm Password</label>
+<input type="password" id="confirmPassword"
+placeholder="Confirm password" minlength="6" required>
+</div>
+
+<div class="input-group">
+<label>Select Membership Plan</label>
+
+<div class="plans">
+
+<div class="plan" data-plan="Standard Membership" data-price="299">
+<strong>₹299</strong>
+<small>Standard</small>
+</div>
+
+<div class="plan" data-plan="Special Membership" data-price="499">
+<strong>₹499</strong>
+<small>Special</small>
+</div>
+
+<div class="plan" data-plan="Premium Membership" data-price="999">
+<strong>₹999</strong>
+<small>Premium</small>
+</div>
+
+</div>
+
+<input type="hidden" id="selectedPlan" required>
+<input type="hidden" id="selectedPrice">
+
+</div>
+
+<div class="qr-box">
+
+<strong>Complete Payment</strong>
+
+<img src="payment-qr.png"
+alt="Nova Rise Academy Payment QR"
+onerror="this.style.display='none';">
+
+<p>
+Scan the QR code and complete your selected membership payment.
+</p>
+
+</div>
+
+<div class="input-group">
+
+<label>Upload Payment Screenshot</label>
+
+<div class="file-box">
+<input type="file"
+id="paymentScreenshot"
+accept="image/png,image/jpeg,image/jpg"
+required>
+</div>
+
+</div>
+
+<div class="notice">
+<strong>Important:</strong><br>
+After submitting your registration and payment proof,
+your details will be reviewed. Membership access is provided
+only after payment verification.
+</div>
+
+<button type="submit">
+Submit Registration
+</button>
+
+</form>
+
+<div class="login-link">
+Already registered?
+<a href="login.html">Login</a>
+</div>
+
+</div>
+
+
+<div id="successSection" class="success">
+
+<div class="success-icon">✓</div>
+
+<h2>Registration Submitted</h2>
+
+<p>
+Your registration and payment proof have been submitted
+successfully.
+<br><br>
+<strong>Status: Payment Verification Pending</strong>
+<br><br>
+Your membership access will be activated after payment
+verification.
+</p>
+
+<button onclick="window.location.href='login.html'">
+Go to Login
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+const plans = document.querySelectorAll(".plan");
+
+let selectedPlan = "";
+let selectedPrice = "";
+
+plans.forEach(plan => {
+
+    plan.addEventListener("click", function(){
+
+        plans.forEach(p => p.classList.remove("selected"));
+
+        this.classList.add("selected");
+
+        selectedPlan = this.dataset.plan;
+        selectedPrice = this.dataset.price;
+
+        document.getElementById("selectedPlan").value = selectedPlan;
+        document.getElementById("selectedPrice").value = selectedPrice;
+
+    });
+
+});
+
+
+document.getElementById("registerForm").addEventListener("submit", function(e){
+
+    e.preventDefault();
+
+    const errorBox = document.getElementById("errorBox");
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const mobile = document.getElementById("mobile").value.trim();
+
+    const password = document.getElementById("password").value;
+    const confirmPassword =
+        document.getElementById("confirmPassword").value;
+
+    const screenshot =
+        document.getElementById("paymentScreenshot").files[0];
+
+    errorBox.style.display = "none";
+
+    if(!name){
+        showError("Please enter your full name.");
+        return;
+    }
+
+    if(!email.toLowerCase().endsWith("@gmail.com")){
+        showError("Please enter a valid Gmail address.");
+        return;
+    }
+
+    if(!/^[0-9]{10}$/.test(mobile)){
+        showError("Please enter a valid 10 digit mobile number.");
+        return;
+    }
+
+    if(password.length < 6){
+        showError("Password must contain at least 6 characters.");
+        return;
+    }
+
+    if(password !== confirmPassword){
+        showError("Passwords do not match.");
+        return;
+    }
+
+    if(!selectedPlan){
+        showError("Please select a membership plan.");
+        return;
+    }
+
+    if(!screenshot){
+        showError("Please upload your payment screenshot.");
+        return;
+    }
+
+    const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png"
+    ];
+
+    if(!allowedTypes.includes(screenshot.type)){
+        showError("Please upload JPG or PNG payment screenshot.");
+        return;
+    }
+
+    if(screenshot.size > 5 * 1024 * 1024){
+        showError("Payment screenshot must be below 5 MB.");
+        return;
+    }
+
+    /*
+      Demo/local registration record.
+      This does NOT create a server-side account.
+    */
+
+    const registration = {
+        name:name,
+        email:email,
+        mobile:mobile,
+        plan:selectedPlan,
+        price:selectedPrice,
+        status:"Payment Verification Pending",
+        submittedAt:new Date().toISOString()
+    };
+
+    localStorage.setItem(
+        "novaRiseRegistration",
+        JSON.stringify(registration)
+    );
+
+    document.getElementById("registrationSection").style.display = "none";
+
+    document.getElementById("successSection").style.display = "block";
+
+});
+
+
+function showError(message){
+
+    const errorBox = document.getElementById("errorBox");
+
+    errorBox.textContent = message;
+    errorBox.style.display = "block";
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+}
+
+</script>
+
+</body>
+</html>
