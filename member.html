@@ -331,35 +331,94 @@ plan + " membership selected.";
 
 }
 
+async function submitPayment(){
 
-function submitPayment(){
+const utr = document.getElementById("utr").value.trim();
+const file = document.getElementById("paymentFile").files[0];
+const planName = document.getElementById("membership").value;
+const message = document.getElementById("paymentMessage");
 
-const utr =
-document.getElementById("utr").value.trim();
-
-const file =
-document.getElementById("paymentFile").files[0];
+if(!planName){
+message.innerText = "Please select a membership first.";
+return;
+}
 
 if(!utr){
-
-document.getElementById("paymentMessage").innerText =
-"Please enter UTR / Transaction ID.";
-
+message.innerText = "Please enter UTR / Transaction ID.";
 return;
 }
 
 if(!file){
-
-document.getElementById("paymentMessage").innerText =
-"Please select payment screenshot.";
-
+message.innerText = "Please select payment screenshot.";
 return;
 }
 
-document.getElementById("paymentMessage").innerText =
-"Payment details received. Payment upload will be connected to Supabase storage in the next step.";
+message.innerText = "Submitting payment...";
 
+const { data: userData, error: userError } =
+await supabaseClient.auth.getUser();
+
+if(userError || !userData.user){
+message.innerText = "Please login again.";
+return;
 }
+
+const user = userData.user;
+
+const { data: plan, error: planError } =
+await supabaseClient
+.from("membership_plans")
+.select("id, name, price")
+.eq("name", planName)
+.eq("is_active", true)
+.single();
+
+if(planError || !plan){
+message.innerText = "Membership plan not found.";
+return;
+}
+
+const fileName =
+user.id + "_" + Date.now() + "_" + file.name;
+
+const { error: uploadError } =
+await supabaseClient
+.storage
+.from("payment-screenshots")
+.upload(fileName, file);
+
+if(uploadError){
+message.innerText =
+"Screenshot upload failed: " + uploadError.message;
+return;
+}
+
+const { error: paymentError } =
+await supabaseClient
+.from("payments")
+.insert({
+member_id: user.id,
+payment_id: utr,
+status: "pending",
+payment_method: "UPI",
+plan_id: plan.id,
+amount: plan.price,
+payment_screenshot_url: fileName
+});
+
+if(paymentError){
+message.innerText =
+"Payment submit failed: " + paymentError.message;
+return;
+}
+
+message.innerText =
+"✅ Payment submitted successfully. Waiting for approval.";
+
+document.getElementById("utr").value = "";
+document.getElementById("paymentFile").value = "";
+
+} 
 
 
 checkUser();
